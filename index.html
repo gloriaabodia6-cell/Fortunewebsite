@@ -1,48 +1,151 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Fortune Video Hub</title>
+  <title>FortuneTok</title>
   <style>
     body {
+      margin: 0;
       font-family: Arial;
-      background-color: #111;
+      background: black;
       color: white;
       text-align: center;
     }
 
     h1 {
-      padding: 20px;
+      padding: 10px;
     }
 
-    .video-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 15px;
-      padding: 20px;
+    input {
+      padding: 10px;
+      width: 60%;
+      margin: 10px;
+    }
+
+    button {
+      padding: 8px 15px;
+      cursor: pointer;
+    }
+
+    .video-feed {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+      margin-top: 20px;
+    }
+
+    .video-card {
+      width: 90%;
+      max-width: 400px;
     }
 
     iframe {
       width: 100%;
-      height: 200px;
-      border-radius: 10px;
+      height: 500px;
+      border-radius: 15px;
+    }
+
+    .like-btn {
+      margin-top: 5px;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 5px;
     }
   </style>
 </head>
 <body>
 
-  <h1>🎥 Fortune Video Hub</h1>
+  <h1>🔥 FortuneTok</h1>
 
-  <div class="video-container">
+  <input type="text" id="videoLink" placeholder="Paste YouTube link here">
+  <button onclick="addVideo()">Upload</button>
 
-    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
+  <br>
+  <input type="text" id="searchInput" placeholder="Search video title..." onkeyup="searchVideos()">
 
-    <iframe src="https://www.youtube.com/embed/9bZkp7q19f0" allowfullscreen></iframe>
+  <div class="video-feed" id="videoFeed"></div>
 
-    <iframe src="https://www.youtube.com/embed/l482T0yNkeo" allowfullscreen></iframe>
+  <script>
+    let videos = JSON.parse(localStorage.getItem("videos")) || [
+      {title:"Sample 1", link:"https://www.youtube.com/embed/dQw4w9WgXcQ", likes:0},
+      {title:"Sample 2", link:"https://www.youtube.com/embed/9bZkp7q19f0", likes:0}
+    ];
 
-    <iframe src="https://www.youtube.com/embed/3tmd-ClpJxA" allowfullscreen></iframe>
+    function saveVideos() {
+      localStorage.setItem("videos", JSON.stringify(videos));
+    }
 
-  </div>
+    function displayVideos() {
+      let feed = document.getElementById("videoFeed");
+      feed.innerHTML = "";
+
+      videos.forEach((video, index) => {
+        feed.innerHTML += `
+          <div class="video-card">
+            <h3>${video.title}</h3>
+            <iframe src="${video.link}" allowfullscreen></iframe>
+            <br>
+            <button class="like-btn" onclick="likeVideo(${index})">
+              ❤️ ${video.likes}
+            </button>
+          </div>
+        `;
+      });
+    }
+
+    function addVideo() {
+      let link = document.getElementById("videoLink").value;
+
+      if(link.includes("watch?v=")){
+        let videoId = link.split("watch?v=")[1];
+        let embedLink = "https://www.youtube.com/embed/" + videoId;
+
+        videos.push({
+          title: "User Video",
+          link: embedLink,
+          likes: 0
+        });
+
+        saveVideos();
+        displayVideos();
+        document.getElementById("videoLink").value = "";
+      } else {
+        alert("Please paste a valid YouTube link.");
+      }
+    }
+
+    function likeVideo(index) {
+      videos[index].likes++;
+      saveVideos();
+      displayVideos();
+    }
+
+    function searchVideos() {
+      let search = document.getElementById("searchInput").value.toLowerCase();
+      let filtered = videos.filter(video =>
+        video.title.toLowerCase().includes(search)
+      );
+
+      let feed = document.getElementById("videoFeed");
+      feed.innerHTML = "";
+
+      filtered.forEach((video, index) => {
+        feed.innerHTML += `
+          <div class="video-card">
+            <h3>${video.title}</h3>
+            <iframe src="${video.link}" allowfullscreen></iframe>
+            <br>
+            <button class="like-btn" onclick="likeVideo(${index})">
+              ❤️ ${video.likes}
+            </button>
+          </div>
+        `;
+      });
+    }
+
+    displayVideos();
+  </script>
 
 </body>
   </html>
