@@ -1,10 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My Website</title>
+  <title>Secret Message Box</title>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      background-color: #f4f4f4;
+      padding: 40px;
+    }
+
+    textarea {
+      width: 80%;
+      height: 120px;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    #savedMessage {
+      margin-top: 20px;
+      font-weight: bold;
+      color: green;
+    }
+  </style>
 </head>
 <body>
-  <h1>My Website Is Live 🎉</h1>
-  <p>This is my first published site.</p>
+
+  <h1>🔐 Secret Message Box</h1>
+  <p>Type your secret below:</p>
+
+  <textarea id="secretInput" placeholder="Type your secret here..."></textarea>
+  <br>
+  <button onclick="saveSecret()">Save Secret</button>
+
+  <p id="savedMessage"></p>
+
+  <script>
+    function saveSecret() {
+      var message = document.getElementById("secretInput").value;
+      localStorage.setItem("mySecret", message);
+      document.getElementById("savedMessage").innerText = "✅ Secret saved on this device!";
+    }
+  </script>
+
 </body>
-</html>
+    </html>
