@@ -1,151 +1,83 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>FortuneTok</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial;
-      background: black;
-      color: white;
-      text-align: center;
-    }
+<title>FortuneTok</title>
+<style>
+body{
+margin:0;
+background:black;
+color:white;
+font-family:sans-serif;
+}
 
-    h1 {
-      padding: 10px;
-    }
+video{
+width:100%;
+height:100vh;
+object-fit:cover;
+scroll-snap-align:start;
+}
 
-    input {
-      padding: 10px;
-      width: 60%;
-      margin: 10px;
-    }
+.container{
+height:100vh;
+overflow-y:scroll;
+scroll-snap-type:y mandatory;
+}
 
-    button {
-      padding: 8px 15px;
-      cursor: pointer;
-    }
-
-    .video-feed {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 30px;
-      margin-top: 20px;
-    }
-
-    .video-card {
-      width: 90%;
-      max-width: 400px;
-    }
-
-    iframe {
-      width: 100%;
-      height: 500px;
-      border-radius: 15px;
-    }
-
-    .like-btn {
-      margin-top: 5px;
-      background: red;
-      color: white;
-      border: none;
-      border-radius: 5px;
-    }
-  </style>
+.upload{
+position:fixed;
+bottom:20px;
+right:20px;
+background:red;
+padding:15px;
+border-radius:50%;
+font-size:20px;
+cursor:pointer;
+}
+</style>
 </head>
+
 <body>
 
-  <h1>💥 FortuneTok 🔥</h1>
+<div class="container" id="feed"></div>
 
-  <input type="text" id="videoLink" placeholder="Paste YouTube link here">
-  <button onclick="addVideo()">Upload</button>
+<input type="file" id="fileInput" hidden accept="video/*">
 
-  <br>
-  <input type="text" id="searchInput" placeholder="Search video title..." onkeyup="searchVideos()">
+<div class="upload" onclick="document.getElementById('fileInput').click()">
++
+</div>
 
-  <div class="video-feed" id="videoFeed"></div>
+<script>
+const cloudName = "dqk5zlv6d";
+const uploadPreset = "YOUR_PRESET_NAME";
 
-  <script>
-    let videos = JSON.parse(localStorage.getItem("videos")) || [
-      {title:"Sample 1", link:"https://www.youtube.com/embed/dQw4w9WgXcQ", likes:0},
-      {title:"Sample 2", link:"https://www.youtube.com/embed/9bZkp7q19f0", likes:0}
-    ];
+const fileInput = document.getElementById("fileInput");
+const feed = document.getElementById("feed");
 
-    function saveVideos() {
-      localStorage.setItem("videos", JSON.stringify(videos));
-    }
+fileInput.addEventListener("change", async function(){
+const file = fileInput.files[0];
+const formData = new FormData();
+formData.append("file", file);
+formData.append("upload_preset", uploadPreset);
 
-    function displayVideos() {
-      let feed = document.getElementById("videoFeed");
-      feed.innerHTML = "";
+const response = await fetch(
+`https://api.cloudinary.com/v1_1/${cloudName}/video/upload`,
+{
+method:"POST",
+body:formData
+}
+);
 
-      videos.forEach((video, index) => {
-        feed.innerHTML += `
-          <div class="video-card">
-            <h3>${video.title}</h3>
-            <iframe src="${video.link}" allowfullscreen></iframe>
-            <br>
-            <button class="like-btn" onclick="likeVideo(${index})">
-              ❤️ ${video.likes}
-            </button>
-          </div>
-        `;
-      });
-    }
+const data = await response.json();
+addVideo(data.secure_url);
+});
 
-    function addVideo() {
-      let link = document.getElementById("videoLink").value;
-
-      if(link.includes("watch?v=")){
-        let videoId = link.split("watch?v=")[1];
-        let embedLink = "https://www.youtube.com/embed/" + videoId;
-
-        videos.push({
-          title: "User Video",
-          link: embedLink,
-          likes: 0
-        });
-
-        saveVideos();
-        displayVideos();
-        document.getElementById("videoLink").value = "";
-      } else {
-        alert("Please paste a valid YouTube link.");
-      }
-    }
-
-    function likeVideo(index) {
-      videos[index].likes++;
-      saveVideos();
-      displayVideos();
-    }
-
-    function searchVideos() {
-      let search = document.getElementById("searchInput").value.toLowerCase();
-      let filtered = videos.filter(video =>
-        video.title.toLowerCase().includes(search)
-      );
-
-      let feed = document.getElementById("videoFeed");
-      feed.innerHTML = "";
-
-      filtered.forEach((video, index) => {
-        feed.innerHTML += `
-          <div class="video-card">
-            <h3>${video.title}</h3>
-            <iframe src="${video.link}" allowfullscreen></iframe>
-            <br>
-            <button class="like-btn" onclick="likeVideo(${index})">
-              ❤️ ${video.likes}
-            </button>
-          </div>
-        `;
-      });
-    }
-
-    displayVideos();
-  </script>
+function addVideo(url){
+const video = document.createElement("video");
+video.src = url;
+video.controls = true;
+feed.appendChild(video);
+}
+</script>
 
 </body>
-  </html>
+</html>
