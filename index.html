@@ -2,82 +2,59 @@
 <html>
 <head>
 <title>FortuneTok</title>
+
 <style>
+
 body{
 margin:0;
 background:black;
 color:white;
-font-family:sans-serif;
+font-family:Arial;
 }
 
-video{
-width:100%;
-height:100vh;
-object-fit:cover;
-scroll-snap-align:start;
-}
-
-.container{
+.feed{
 height:100vh;
 overflow-y:scroll;
 scroll-snap-type:y mandatory;
 }
 
-.upload{
-position:fixed;
-bottom:30px;
-right:20px;
-background:red;
-padding:15px;
-border-radius:50%;
-font-size:40px;
-cursor:pointer;
+.video{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+scroll-snap-align:start;
 }
+
+video{
+height:80vh;
+border-radius:10px;
+}
+
 </style>
+
 </head>
 
 <body>
 
-<div class="container" id="feed"></div>
+<h2 style="text-align:center;">FortuneTok</h2>
 
-<input type="file" id="fileInput" hidden accept="video/*">
+<div class="feed">
 
-<div class="upload" onclick="document.getElementById('fileInput').click()">
-+
+<div class="video">
+<video src="video1.mp4" controls></video>
 </div>
 
-<script>
-const cloudName = "dqk5zlv6d";
-const uploadPreset = "YOUR_PRESET_NAME";
+<div class="video">
+<video src="video2.mp4" controls></video>
+</div>
 
-const fileInput = document.getElementById("fileInput");
-const feed = document.getElementById("feed");
+<div class="video">
+<video src="video3.mp4" controls></video>
+</div>
 
-fileInput.addEventListener("change", async function(){
-const file = fileInput.files[0];
-const formData = new FormData();
-formData.append("file", file);
-formData.append("upload_preset", uploadPreset);
-
-const response = await fetch(
-`https://api.cloudinary.com/v1_1/${cloudName}/video/upload`,
-{
-method:"POST",
-body:formData
-}
-);
-
-const data = await response.json();
-addVideo(data.secure_url);
-});
-
-function addVideo(url){
-const video = document.createElement("video");
-video.src = url;
-video.controls = true;
-feed.appendChild(video);
-}
-</script>
+</div>
 
 </body>
 </html>
